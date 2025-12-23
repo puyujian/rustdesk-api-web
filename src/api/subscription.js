@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import request from '@/utils/request_api'
 
 export function getPlans () {
   return request({

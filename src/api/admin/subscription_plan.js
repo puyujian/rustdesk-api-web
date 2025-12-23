@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function list (params) {
   return request({
-    url: '/admin/subscription_plan/list',
+    url: '/subscription_plan/list',
     method: 'get',
     params,
   })
@@ -10,14 +10,14 @@ export function list (params) {
 
 export function detail (id) {
   return request({
-    url: `/admin/subscription_plan/detail/${id}`,
+    url: `/subscription_plan/detail/${id}`,
     method: 'get',
   })
 }
 
 export function create (data) {
   return request({
-    url: '/admin/subscription_plan/create',
+    url: '/subscription_plan/create',
     method: 'post',
     data,
   })
@@ -25,7 +25,7 @@ export function create (data) {
 
 export function update (data) {
   return request({
-    url: '/admin/subscription_plan/update',
+    url: '/subscription_plan/update',
     method: 'post',
     data,
   })
@@ -33,7 +33,7 @@ export function update (data) {
 
 export function remove (data) {
   return request({
-    url: '/admin/subscription_plan/delete',
+    url: '/subscription_plan/delete',
     method: 'post',
     data,
   })
