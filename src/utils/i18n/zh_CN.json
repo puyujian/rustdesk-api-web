@@ -547,5 +547,146 @@
   },
   "Remark": {
     "One": "备注"
+  },
+  "Subscription": {
+    "One": "订阅"
+  },
+  "SubscriptionManage": {
+    "One": "订阅管理"
+  },
+  "SubscriptionPlan": {
+    "One": "订阅套餐"
+  },
+  "SubscriptionPlanManage": {
+    "One": "套餐管理"
+  },
+  "OrderManage": {
+    "One": "订单管理"
+  },
+  "MySubscription": {
+    "One": "我的订阅"
+  },
+  "MyOrders": {
+    "One": "我的订单"
+  },
+  "PlanName": {
+    "One": "套餐名称"
+  },
+  "Price": {
+    "One": "价格"
+  },
+  "Duration": {
+    "One": "时长"
+  },
+  "DurationDays": {
+    "One": "时长(天)"
+  },
+  "Features": {
+    "One": "功能特性"
+  },
+  "Description": {
+    "One": "描述"
+  },
+  "Subscribe": {
+    "One": "订阅"
+  },
+  "CurrentPlan": {
+    "One": "当前套餐"
+  },
+  "ExpireAt": {
+    "One": "到期时间"
+  },
+  "OrderNo": {
+    "One": "订单号"
+  },
+  "OrderStatus": {
+    "One": "订单状态"
+  },
+  "PaymentMethod": {
+    "One": "支付方式"
+  },
+  "PaymentTime": {
+    "One": "支付时间"
+  },
+  "Amount": {
+    "One": "金额"
+  },
+  "Pending": {
+    "One": "待支付"
+  },
+  "Paid": {
+    "One": "已支付"
+  },
+  "Cancelled": {
+    "One": "已取消"
+  },
+  "Refunded": {
+    "One": "已退款"
+  },
+  "Expired": {
+    "One": "已过期"
+  },
+  "Active": {
+    "One": "生效中"
+  },
+  "Inactive": {
+    "One": "未生效"
+  },
+  "Refund": {
+    "One": "退款"
+  },
+  "Grant": {
+    "One": "赠送"
+  },
+  "GrantSubscription": {
+    "One": "赠送订阅"
+  },
+  "CancelSubscription": {
+    "One": "取消订阅"
+  },
+  "SelectUser": {
+    "One": "选择用户"
+  },
+  "SelectPlan": {
+    "One": "选择套餐"
+  },
+  "PayNow": {
+    "One": "立即支付"
+  },
+  "Free": {
+    "One": "免费"
+  },
+  "NoSubscription": {
+    "One": "暂无订阅"
+  },
+  "SubscribeNow": {
+    "One": "立即订阅"
+  },
+  "RenewNow": {
+    "One": "立即续费"
+  },
+  "PaymentSuccess": {
+    "One": "支付成功"
+  },
+  "PaymentFailed": {
+    "One": "支付失败"
+  },
+  "PaymentProcessing": {
+    "One": "支付处理中"
+  },
+  "BackToHome": {
+    "One": "返回首页"
+  },
+  "ViewOrders": {
+    "One": "查看订单"
+  },
+  "Sort": {
+    "One": "排序"
+  },
+  "Enabled": {
+    "One": "启用"
+  },
+  "Disabled": {
+    "One": "禁用"
   }
 }

@@ -30,6 +30,12 @@ const constantRoutes = [
     component: () => import('@/views/oauth/bind.vue'),
     hidden: true,
   },
+  {
+    path: '/payment/result',
+    meta: { title: 'PaymentResult' },
+    component: () => import('@/views/payment/result.vue'),
+    hidden: true,
+  },
 ]
 export const asyncRoutes = [
   // {
@@ -96,6 +102,18 @@ export const asyncRoutes = [
         name: 'MyLoginLog',
         meta: { title: 'LoginLog', icon: 'List' /*keepAlive: true*/ },
         component: () => import('@/views/my/login_log/index.vue'),
+      },
+      {
+        path: 'subscription',
+        name: 'MySubscription',
+        meta: { title: 'MySubscription', icon: 'Goods' /*keepAlive: true*/ },
+        component: () => import('@/views/my/subscription.vue'),
+      },
+      {
+        path: 'orders',
+        name: 'MyOrders',
+        meta: { title: 'MyOrders', icon: 'List' /*keepAlive: true*/ },
+        component: () => import('@/views/my/orders.vue'),
       },
     ],
   },
@@ -201,6 +219,24 @@ export const asyncRoutes = [
         name: 'ServerCmd',
         meta: { title: 'ServerCmd', icon: 'Tools' /*keepAlive: true*/ },
         component: () => import('@/views/rustdesk/control.vue'),
+      },
+      {
+        path: '/subscriptionPlan',
+        name: 'SubscriptionPlan',
+        meta: { title: 'SubscriptionPlanManage', icon: 'Goods' /*keepAlive: true*/ },
+        component: () => import('@/views/admin/subscription_plan.vue'),
+      },
+      {
+        path: '/adminOrder',
+        name: 'AdminOrder',
+        meta: { title: 'OrderManage', icon: 'List' /*keepAlive: true*/ },
+        component: () => import('@/views/admin/order.vue'),
+      },
+      {
+        path: '/adminSubscription',
+        name: 'AdminSubscription',
+        meta: { title: 'SubscriptionManage', icon: 'Ticket' /*keepAlive: true*/ },
+        component: () => import('@/views/admin/subscription.vue'),
       },
     ],
   },

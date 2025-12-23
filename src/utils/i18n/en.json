@@ -531,5 +531,146 @@
   },
   "Remark": {
     "One": "Remark"
+  },
+  "Subscription": {
+    "One": "Subscription"
+  },
+  "SubscriptionManage": {
+    "One": "Subscription Manage"
+  },
+  "SubscriptionPlan": {
+    "One": "Subscription Plan"
+  },
+  "SubscriptionPlanManage": {
+    "One": "Plan Manage"
+  },
+  "OrderManage": {
+    "One": "Order Manage"
+  },
+  "MySubscription": {
+    "One": "My Subscription"
+  },
+  "MyOrders": {
+    "One": "My Orders"
+  },
+  "PlanName": {
+    "One": "Plan Name"
+  },
+  "Price": {
+    "One": "Price"
+  },
+  "Duration": {
+    "One": "Duration"
+  },
+  "DurationDays": {
+    "One": "Duration (Days)"
+  },
+  "Features": {
+    "One": "Features"
+  },
+  "Description": {
+    "One": "Description"
+  },
+  "Subscribe": {
+    "One": "Subscribe"
+  },
+  "CurrentPlan": {
+    "One": "Current Plan"
+  },
+  "ExpireAt": {
+    "One": "Expire At"
+  },
+  "OrderNo": {
+    "One": "Order No"
+  },
+  "OrderStatus": {
+    "One": "Order Status"
+  },
+  "PaymentMethod": {
+    "One": "Payment Method"
+  },
+  "PaymentTime": {
+    "One": "Payment Time"
+  },
+  "Amount": {
+    "One": "Amount"
+  },
+  "Pending": {
+    "One": "Pending"
+  },
+  "Paid": {
+    "One": "Paid"
+  },
+  "Cancelled": {
+    "One": "Cancelled"
+  },
+  "Refunded": {
+    "One": "Refunded"
+  },
+  "Expired": {
+    "One": "Expired"
+  },
+  "Active": {
+    "One": "Active"
+  },
+  "Inactive": {
+    "One": "Inactive"
+  },
+  "Refund": {
+    "One": "Refund"
+  },
+  "Grant": {
+    "One": "Grant"
+  },
+  "GrantSubscription": {
+    "One": "Grant Subscription"
+  },
+  "CancelSubscription": {
+    "One": "Cancel Subscription"
+  },
+  "SelectUser": {
+    "One": "Select User"
+  },
+  "SelectPlan": {
+    "One": "Select Plan"
+  },
+  "PayNow": {
+    "One": "Pay Now"
+  },
+  "Free": {
+    "One": "Free"
+  },
+  "NoSubscription": {
+    "One": "No Subscription"
+  },
+  "SubscribeNow": {
+    "One": "Subscribe Now"
+  },
+  "RenewNow": {
+    "One": "Renew Now"
+  },
+  "PaymentSuccess": {
+    "One": "Payment Success"
+  },
+  "PaymentFailed": {
+    "One": "Payment Failed"
+  },
+  "PaymentProcessing": {
+    "One": "Payment Processing"
+  },
+  "BackToHome": {
+    "One": "Back To Home"
+  },
+  "ViewOrders": {
+    "One": "View Orders"
+  },
+  "Sort": {
+    "One": "Sort"
+  },
+  "Enabled": {
+    "One": "Enabled"
+  },
+  "Disabled": {
+    "One": "Disabled"
   }
 }
