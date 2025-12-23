@@ -42,19 +42,13 @@
           <div class="plan-header">
             <h3>{{ plan.name }}</h3>
             <div class="plan-price">
-              <span v-if="plan.price > 0" class="price">¥{{ plan.price }}</span>
+              <span v-if="plan.price > 0" class="price">¥{{ formatPrice(plan.price) }}</span>
               <span v-else class="price free">{{ T('Free') }}</span>
-              <span class="duration">/ {{ plan.duration }} {{ T('Days') }}</span>
+              <span class="duration">/ {{ formatDuration(plan) }}</span>
             </div>
           </div>
           <div class="plan-description" v-if="plan.description">
             {{ plan.description }}
-          </div>
-          <div class="plan-features" v-if="plan.features">
-            <div v-for="(feature, idx) in parseFeatures(plan.features)" :key="idx" class="feature-item">
-              <el-icon><ElIconCheck /></el-icon>
-              <span>{{ feature }}</span>
-            </div>
           </div>
           <div class="plan-action">
             <el-button
@@ -97,6 +91,28 @@ const status = reactive({
   expire_at: '',
 })
 
+const formatPrice = (priceFen) => {
+  if (!priceFen) return '0.00'
+  return (priceFen / 100).toFixed(2)
+}
+
+const formatDuration = (plan) => {
+  const count = plan.period_count || 1
+  const unit = plan.period_unit || 'month'
+  const unitMap = {
+    day: T('Days'),
+    month: T('Months'),
+    year: T('Years'),
+  }
+  return `${count} ${unitMap[unit] || unit}`
+}
+
+const formatTimestamp = (ts) => {
+  if (!ts) return '-'
+  const date = new Date(ts * 1000)
+  return date.toLocaleString()
+}
+
 const loadPlans = async () => {
   loading.value = true
   const res = await getPlans().catch(() => false)
@@ -109,17 +125,12 @@ const loadPlans = async () => {
 const loadStatus = async () => {
   const res = await getStatus().catch(() => false)
   if (res && res.data) {
-    Object.assign(status, res.data)
-  }
-}
-
-const parseFeatures = (features) => {
-  if (!features) return []
-  if (Array.isArray(features)) return features
-  try {
-    return JSON.parse(features)
-  } catch {
-    return features.split('\n').filter(f => f.trim())
+    const data = res.data
+    const sub = data.subscription || {}
+    status.plan_id = sub.plan_id || null
+    status.plan_name = sub.plan?.name || ''
+    status.is_active = data.active || false
+    status.expire_at = sub.expire_at ? formatTimestamp(sub.expire_at) : ''
   }
 }
 
@@ -130,7 +141,7 @@ const handleSubscribe = async (plan) => {
   if (res && res.data) {
     if (res.data.pay_url) {
       window.location.href = res.data.pay_url
-    } else if (res.data.order_no) {
+    } else if (res.data.out_trade_no) {
       ElMessage.success(T('OperationSuccess'))
       loadStatus()
     }

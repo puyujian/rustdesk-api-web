@@ -3,17 +3,17 @@
     <el-card class="list-query" shadow="hover">
       <el-form inline label-width="80px">
         <el-form-item :label="T('OrderNo')">
-          <el-input v-model="listQuery.order_no" clearable />
+          <el-input v-model="listQuery.out_trade_no" clearable />
         </el-form-item>
-        <el-form-item :label="T('Username')">
-          <el-input v-model="listQuery.username" clearable />
+        <el-form-item :label="T('UserId')">
+          <el-input v-model="listQuery.user_id" clearable type="number" />
         </el-form-item>
         <el-form-item :label="T('OrderStatus')">
           <el-select v-model="listQuery.status" clearable>
-            <el-option :label="T('Pending')" value="pending" />
-            <el-option :label="T('Paid')" value="paid" />
-            <el-option :label="T('Cancelled')" value="cancelled" />
-            <el-option :label="T('Refunded')" value="refunded" />
+            <el-option :label="T('Pending')" :value="0" />
+            <el-option :label="T('Paid')" :value="1" />
+            <el-option :label="T('Refunded')" :value="2" />
+            <el-option :label="T('Closed')" :value="3" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -24,26 +24,41 @@
     <el-card class="list-body" shadow="hover">
       <el-table :data="listRes.list" v-loading="listRes.loading" border>
         <el-table-column prop="id" label="ID" align="center" width="80" />
-        <el-table-column prop="order_no" :label="T('OrderNo')" align="center" min-width="180" />
-        <el-table-column prop="username" :label="T('Username')" align="center" />
-        <el-table-column prop="plan_name" :label="T('PlanName')" align="center" />
-        <el-table-column prop="amount" :label="T('Amount')" align="center">
+        <el-table-column prop="out_trade_no" :label="T('OrderNo')" align="center" min-width="200" />
+        <el-table-column :label="T('Username')" align="center">
           <template #default="{ row }">
-            <span>¥{{ row.amount }}</span>
+            {{ row.user?.username || '-' }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" :label="T('OrderStatus')" align="center">
+        <el-table-column :label="T('PlanName')" align="center">
+          <template #default="{ row }">
+            {{ row.plan?.name || row.subject || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('Amount')" align="center">
+          <template #default="{ row }">
+            <span>¥{{ formatPrice(row.amount) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('OrderStatus')" align="center">
           <template #default="{ row }">
             <el-tag :type="statusType(row.status)">{{ statusText(row.status) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="payment_method" :label="T('PaymentMethod')" align="center" />
-        <el-table-column prop="paid_at" :label="T('PaymentTime')" align="center" min-width="160" />
-        <el-table-column prop="created_at" :label="T('CreatedAt')" align="center" min-width="160" />
+        <el-table-column :label="T('PaymentTime')" align="center" min-width="160">
+          <template #default="{ row }">
+            {{ formatTimestamp(row.paid_at) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('CreatedAt')" align="center" min-width="160">
+          <template #default="{ row }">
+            {{ row.created_at }}
+          </template>
+        </el-table-column>
         <el-table-column :label="T('Actions')" align="center" width="100">
           <template #default="{ row }">
             <el-button
-              v-if="row.status === 'paid'"
+              v-if="row.status === 1"
               type="danger"
               size="small"
               @click="handleRefund(row)"
@@ -82,14 +97,31 @@ const listRes = reactive({
 const listQuery = reactive({
   page: 1,
   page_size: 10,
-  order_no: '',
-  username: '',
+  out_trade_no: '',
+  user_id: '',
   status: null,
 })
 
+const formatPrice = (priceFen) => {
+  if (!priceFen && priceFen !== 0) return '0.00'
+  return (priceFen / 100).toFixed(2)
+}
+
+const formatTimestamp = (ts) => {
+  if (!ts) return '-'
+  const date = new Date(ts * 1000)
+  return date.toLocaleString()
+}
+
 const getList = async () => {
   listRes.loading = true
-  const res = await list(listQuery).catch(() => false)
+  const params = { ...listQuery }
+  if (!params.out_trade_no) delete params.out_trade_no
+  if (!params.user_id) delete params.user_id
+  if (params.status === null || params.status === undefined) {
+    delete params.status
+  }
+  const res = await list(params).catch(() => false)
   listRes.loading = false
   if (res && res.data) {
     listRes.list = res.data.list || []
@@ -104,22 +136,22 @@ const handlerQuery = () => {
 
 const statusType = (status) => {
   const map = {
-    pending: 'warning',
-    paid: 'success',
-    cancelled: 'info',
-    refunded: 'danger',
+    0: 'warning',
+    1: 'success',
+    2: 'danger',
+    3: 'info',
   }
-  return map[status] || 'info'
+  return map[status] ?? 'info'
 }
 
 const statusText = (status) => {
   const map = {
-    pending: T('Pending'),
-    paid: T('Paid'),
-    cancelled: T('Cancelled'),
-    refunded: T('Refunded'),
+    0: T('Pending'),
+    1: T('Paid'),
+    2: T('Refunded'),
+    3: T('Closed'),
   }
-  return map[status] || status
+  return map[status] ?? String(status)
 }
 
 const handleRefund = async (row) => {
@@ -129,7 +161,7 @@ const handleRefund = async (row) => {
     type: 'warning',
   }).catch(() => false)
   if (!cf) return
-  const res = await refund({ id: row.id }).catch(() => false)
+  const res = await refund({ order_id: row.id, reason: 'Admin refund' }).catch(() => false)
   if (res) {
     ElMessage.success(T('OperationSuccess'))
     getList()

@@ -2,13 +2,14 @@
   <div>
     <el-card class="list-query" shadow="hover">
       <el-form inline label-width="80px">
-        <el-form-item :label="T('Username')">
-          <el-input v-model="listQuery.username" clearable />
+        <el-form-item :label="T('UserId')">
+          <el-input v-model="listQuery.user_id" clearable type="number" />
         </el-form-item>
         <el-form-item :label="T('Status')">
           <el-select v-model="listQuery.status" clearable>
             <el-option :label="T('Active')" :value="1" />
-            <el-option :label="T('Inactive')" :value="0" />
+            <el-option :label="T('Expired')" :value="2" />
+            <el-option :label="T('Cancelled')" :value="3" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -20,17 +21,33 @@
     <el-card class="list-body" shadow="hover">
       <el-table :data="listRes.list" v-loading="listRes.loading" border>
         <el-table-column prop="id" label="ID" align="center" width="80" />
-        <el-table-column prop="username" :label="T('Username')" align="center" />
-        <el-table-column prop="plan_name" :label="T('PlanName')" align="center" />
-        <el-table-column prop="status" :label="T('Status')" align="center">
+        <el-table-column :label="T('Username')" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'">
-              {{ row.status === 1 ? T('Active') : T('Inactive') }}
+            {{ row.user?.username || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('PlanName')" align="center">
+          <template #default="{ row }">
+            {{ row.plan?.name || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('Status')" align="center">
+          <template #default="{ row }">
+            <el-tag :type="statusType(row.status)">
+              {{ statusText(row.status) }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="start_at" :label="T('CreatedAt')" align="center" min-width="160" />
-        <el-table-column prop="expire_at" :label="T('ExpireAt')" align="center" min-width="160" />
+        <el-table-column :label="T('StartAt')" align="center" min-width="160">
+          <template #default="{ row }">
+            {{ formatTimestamp(row.start_at) }}
+          </template>
+        </el-table-column>
+        <el-table-column :label="T('ExpireAt')" align="center" min-width="160">
+          <template #default="{ row }">
+            {{ formatTimestamp(row.expire_at) }}
+          </template>
+        </el-table-column>
         <el-table-column :label="T('Actions')" align="center" width="100">
           <template #default="{ row }">
             <el-button
@@ -78,8 +95,8 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="T('DurationDays')" prop="duration">
-          <el-input-number v-model="grantData.duration" :min="1" />
+        <el-form-item :label="T('DurationDays')" prop="days">
+          <el-input-number v-model="grantData.days" :min="1" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -107,16 +124,45 @@ const listRes = reactive({
 const listQuery = reactive({
   page: 1,
   page_size: 10,
-  username: '',
+  user_id: '',
   status: null,
 })
 
 const allUsers = ref([])
 const planList = ref([])
 
+const formatTimestamp = (ts) => {
+  if (!ts) return '-'
+  const date = new Date(ts * 1000)
+  return date.toLocaleString()
+}
+
+const statusType = (status) => {
+  const map = {
+    1: 'success',
+    2: 'warning',
+    3: 'danger',
+  }
+  return map[status] ?? 'info'
+}
+
+const statusText = (status) => {
+  const map = {
+    1: T('Active'),
+    2: T('Expired'),
+    3: T('Cancelled'),
+  }
+  return map[status] ?? String(status)
+}
+
 const getList = async () => {
   listRes.loading = true
-  const res = await list(listQuery).catch(() => false)
+  const params = { ...listQuery }
+  if (!params.user_id) delete params.user_id
+  if (params.status === null || params.status === undefined) {
+    delete params.status
+  }
+  const res = await list(params).catch(() => false)
   listRes.loading = false
   if (res && res.data) {
     listRes.list = res.data.list || []
@@ -148,20 +194,20 @@ const grantForm = ref(null)
 const grantData = reactive({
   user_id: null,
   plan_id: null,
-  duration: 30,
+  days: 30,
 })
 
 const grantRules = {
   user_id: [{ required: true, message: T('ParamRequired', { param: T('SelectUser') }), trigger: 'change' }],
   plan_id: [{ required: true, message: T('ParamRequired', { param: T('SelectPlan') }), trigger: 'change' }],
-  duration: [{ required: true, message: T('ParamRequired', { param: T('DurationDays') }), trigger: 'blur' }],
+  days: [{ required: true, message: T('ParamRequired', { param: T('DurationDays') }), trigger: 'blur' }],
 }
 
 const toGrant = () => {
   grantVisible.value = true
   grantData.user_id = null
   grantData.plan_id = null
-  grantData.duration = 30
+  grantData.days = 30
 }
 
 const submitGrant = async () => {
@@ -182,7 +228,7 @@ const handleCancel = async (row) => {
     type: 'warning',
   }).catch(() => false)
   if (!cf) return
-  const res = await cancel({ id: row.id }).catch(() => false)
+  const res = await cancel({ user_id: row.user_id }).catch(() => false)
   if (res) {
     ElMessage.success(T('OperationSuccess'))
     getList()

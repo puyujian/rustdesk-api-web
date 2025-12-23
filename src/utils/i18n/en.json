@@ -672,5 +672,27 @@
   },
   "Disabled": {
     "One": "Disabled"
+  },
+  "PlanCode": {
+    "One": "Plan Code"
+  },
+  "Yuan": {
+    "One": "CNY"
+  },
+  "Years": {
+    "One": "Year",
+    "Other": "Years"
+  },
+  "Closed": {
+    "One": "Closed"
+  },
+  "StartAt": {
+    "One": "Start At"
+  },
+  "UserId": {
+    "One": "User ID"
+  },
+  "OperationFailed": {
+    "One": "Operation Failed"
   }
 }

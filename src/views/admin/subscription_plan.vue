@@ -11,16 +11,21 @@
     <el-card class="list-body" shadow="hover">
       <el-table :data="listRes.list" v-loading="listRes.loading" border>
         <el-table-column prop="id" label="ID" align="center" width="80" />
+        <el-table-column prop="code" :label="T('PlanCode')" align="center" />
         <el-table-column prop="name" :label="T('PlanName')" align="center" />
-        <el-table-column prop="price" :label="T('Price')" align="center">
+        <el-table-column :label="T('Price')" align="center">
           <template #default="{ row }">
-            <span>¥{{ row.price }}</span>
+            <span>¥{{ formatPrice(row.price) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="duration" :label="T('DurationDays')" align="center" />
+        <el-table-column :label="T('Duration')" align="center">
+          <template #default="{ row }">
+            {{ row.period_count }} {{ periodUnitText(row.period_unit) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="description" :label="T('Description')" align="center" show-overflow-tooltip />
-        <el-table-column prop="sort" :label="T('Sort')" align="center" width="80" />
-        <el-table-column prop="status" :label="T('Status')" align="center" width="100">
+        <el-table-column prop="sort_order" :label="T('Sort')" align="center" width="80" />
+        <el-table-column :label="T('Status')" align="center" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
               {{ row.status === 1 ? T('Enabled') : T('Disabled') }}
@@ -49,26 +54,32 @@
 
     <el-dialog v-model="formVisible" width="600" :title="!formData.id ? T('Create') : T('Update')">
       <el-form ref="form" :model="formData" label-width="120px" :rules="rules">
+        <el-form-item :label="T('PlanCode')" prop="code">
+          <el-input v-model="formData.code" placeholder="e.g. monthly, yearly" />
+        </el-form-item>
         <el-form-item :label="T('PlanName')" prop="name">
           <el-input v-model="formData.name" />
         </el-form-item>
         <el-form-item :label="T('Price')" prop="price">
-          <el-input-number v-model="formData.price" :min="0" :precision="2" />
+          <el-input-number v-model="formData.price" :min="0" :precision="2" :step="0.01" />
+          <span style="margin-left: 8px; color: #999;">{{ T('Yuan') }}</span>
         </el-form-item>
-        <el-form-item :label="T('DurationDays')" prop="duration">
-          <el-input-number v-model="formData.duration" :min="1" />
+        <el-form-item :label="T('Duration')" prop="period_count">
+          <el-input-number v-model="formData.period_count" :min="1" style="width: 120px;" />
+          <el-select v-model="formData.period_unit" style="width: 100px; margin-left: 8px;">
+            <el-option :label="T('Days')" value="day" />
+            <el-option :label="T('Months')" value="month" />
+            <el-option :label="T('Years')" value="year" />
+          </el-select>
         </el-form-item>
         <el-form-item :label="T('Description')" prop="description">
           <el-input v-model="formData.description" type="textarea" :rows="3" />
         </el-form-item>
-        <el-form-item :label="T('Features')" prop="features">
-          <el-input v-model="formData.features" type="textarea" :rows="4" placeholder="每行一个功能特性" />
-        </el-form-item>
-        <el-form-item :label="T('Sort')" prop="sort">
-          <el-input-number v-model="formData.sort" :min="0" />
+        <el-form-item :label="T('Sort')" prop="sort_order">
+          <el-input-number v-model="formData.sort_order" :min="0" />
         </el-form-item>
         <el-form-item :label="T('Status')" prop="status">
-          <el-switch v-model="formData.status" :active-value="1" :inactive-value="0" />
+          <el-switch v-model="formData.status" :active-value="1" :inactive-value="2" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -96,6 +107,20 @@ const listQuery = reactive({
   page_size: 10,
 })
 
+const formatPrice = (priceFen) => {
+  if (!priceFen && priceFen !== 0) return '0.00'
+  return (priceFen / 100).toFixed(2)
+}
+
+const periodUnitText = (unit) => {
+  const map = {
+    day: T('Days'),
+    month: T('Months'),
+    year: T('Years'),
+  }
+  return map[unit] || unit
+}
+
 const getList = async () => {
   listRes.loading = true
   const res = await list(listQuery).catch(() => false)
@@ -115,49 +140,59 @@ const formVisible = ref(false)
 const form = ref(null)
 const formData = reactive({
   id: 0,
+  code: '',
   name: '',
   price: 0,
-  duration: 30,
+  period_unit: 'month',
+  period_count: 1,
   description: '',
-  features: '',
-  sort: 0,
+  sort_order: 0,
   status: 1,
 })
 
 const rules = {
+  code: [{ required: true, message: T('ParamRequired', { param: T('PlanCode') }), trigger: 'blur' }],
   name: [{ required: true, message: T('ParamRequired', { param: T('PlanName') }), trigger: 'blur' }],
-  duration: [{ required: true, message: T('ParamRequired', { param: T('DurationDays') }), trigger: 'blur' }],
+  period_count: [{ required: true, message: T('ParamRequired', { param: T('Duration') }), trigger: 'blur' }],
 }
 
 const toAdd = () => {
   formVisible.value = true
   formData.id = 0
+  formData.code = ''
   formData.name = ''
   formData.price = 0
-  formData.duration = 30
+  formData.period_unit = 'month'
+  formData.period_count = 1
   formData.description = ''
-  formData.features = ''
-  formData.sort = 0
+  formData.sort_order = 0
   formData.status = 1
 }
 
 const toEdit = (row) => {
   formVisible.value = true
   formData.id = row.id
+  formData.code = row.code
   formData.name = row.name
-  formData.price = row.price
-  formData.duration = row.duration
+  formData.price = row.price / 100
+  formData.period_unit = row.period_unit || 'month'
+  formData.period_count = row.period_count || 1
   formData.description = row.description
-  formData.features = row.features
-  formData.sort = row.sort
+  formData.sort_order = row.sort_order
   formData.status = row.status
 }
 
 const submit = async () => {
   const v = await form.value.validate().catch(() => false)
   if (!v) return
+
+  const submitData = {
+    ...formData,
+    price: Math.round(formData.price * 100),
+  }
+
   const api = formData.id ? update : create
-  const res = await api(formData).catch(() => false)
+  const res = await api(submitData).catch(() => false)
   if (res) {
     ElMessage.success(T('OperationSuccess'))
     formVisible.value = false

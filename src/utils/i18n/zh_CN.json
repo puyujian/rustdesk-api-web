@@ -688,5 +688,26 @@
   },
   "Disabled": {
     "One": "禁用"
+  },
+  "PlanCode": {
+    "One": "套餐编码"
+  },
+  "Yuan": {
+    "One": "元"
+  },
+  "Years": {
+    "One": "年"
+  },
+  "Closed": {
+    "One": "已关闭"
+  },
+  "StartAt": {
+    "One": "开始时间"
+  },
+  "UserId": {
+    "One": "用户ID"
+  },
+  "OperationFailed": {
+    "One": "操作失败"
   }
 }
