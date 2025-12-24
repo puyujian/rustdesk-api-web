@@ -31,7 +31,16 @@
       <template #header>
         <span>{{ T('SubscriptionPlan') }}</span>
       </template>
+      <el-alert
+        v-if="!paymentEnabled"
+        type="warning"
+        :title="T('PaymentDisabled')"
+        :closable="false"
+        show-icon
+        style="margin-bottom: 16px;"
+      />
       <div class="plans-grid" v-loading="loading">
+        <el-empty v-if="!loading && plans.length === 0" :description="paymentEnabled ? T('NoData') : T('PaymentDisabled')" />
         <el-card
           v-for="plan in plans"
           :key="plan.id"
@@ -84,6 +93,7 @@ const router = useRouter()
 const loading = ref(false)
 const subscribing = ref(null)
 const plans = ref([])
+const paymentEnabled = ref(true)
 const status = reactive({
   plan_id: null,
   plan_name: '',
@@ -115,36 +125,58 @@ const formatTimestamp = (ts) => {
 
 const loadPlans = async () => {
   loading.value = true
-  const res = await getPlans().catch(() => false)
-  loading.value = false
-  if (res && res.data) {
-    plans.value = res.data.list || res.data || []
+  try {
+    const res = await getPlans()
+    if (res && res.data) {
+      plans.value = res.data.list || res.data || []
+    }
+  } catch (e) {
+    // 支付功能未启用时不显示错误提示，只记录状态
+    if (e && e.code === 101) {
+      paymentEnabled.value = false
+    }
+  } finally {
+    loading.value = false
   }
 }
 
 const loadStatus = async () => {
-  const res = await getStatus().catch(() => false)
-  if (res && res.data) {
-    const data = res.data
-    const sub = data.subscription || {}
-    status.plan_id = sub.plan_id || null
-    status.plan_name = sub.plan?.name || ''
-    status.is_active = data.active || false
-    status.expire_at = sub.expire_at ? formatTimestamp(sub.expire_at) : ''
+  try {
+    const res = await getStatus()
+    if (res && res.data) {
+      const data = res.data
+      paymentEnabled.value = data.payment_enabled !== false
+      const sub = data.subscription || {}
+      status.plan_id = sub.plan_id || null
+      status.plan_name = sub.plan?.name || ''
+      status.is_active = data.active || false
+      status.expire_at = sub.expire_at ? formatTimestamp(sub.expire_at) : ''
+    }
+  } catch (e) {
+    // 忽略错误
   }
 }
 
 const handleSubscribe = async (plan) => {
+  if (!paymentEnabled.value) {
+    ElMessage.warning(T('PaymentDisabled'))
+    return
+  }
   subscribing.value = plan.id
-  const res = await createOrder({ plan_id: plan.id }).catch(() => false)
-  subscribing.value = null
-  if (res && res.data) {
-    if (res.data.pay_url) {
-      window.location.href = res.data.pay_url
-    } else if (res.data.out_trade_no) {
-      ElMessage.success(T('OperationSuccess'))
-      loadStatus()
+  try {
+    const res = await createOrder({ plan_id: plan.id })
+    if (res && res.data) {
+      if (res.data.pay_url) {
+        window.location.href = res.data.pay_url
+      } else if (res.data.out_trade_no) {
+        ElMessage.success(T('OperationSuccess'))
+        loadStatus()
+      }
     }
+  } catch (e) {
+    // 错误已由 request 拦截器处理
+  } finally {
+    subscribing.value = null
   }
 }
 

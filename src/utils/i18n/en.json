@@ -694,5 +694,11 @@
   },
   "OperationFailed": {
     "One": "Operation Failed"
+  },
+  "PaymentDisabled": {
+    "One": "Payment feature is not enabled"
+  },
+  "NoData": {
+    "One": "No data"
   }
 }

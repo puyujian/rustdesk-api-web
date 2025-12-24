@@ -121,13 +121,59 @@ const periodUnitText = (unit) => {
   return map[unit] || unit
 }
 
+const unwrapResponseData = (res) => {
+  if (!res) return null
+
+  // request 拦截器默认返回后端统一结构：{ code, message, data }
+  if (typeof res === 'object' && !Array.isArray(res) && 'code' in res && 'data' in res) {
+    return res.data
+  }
+
+  // 兼容未来可能返回 axios 原始 response：{ data: { code, message, data } }
+  if (
+    typeof res === 'object' &&
+    !Array.isArray(res) &&
+    'data' in res &&
+    res.data &&
+    typeof res.data === 'object' &&
+    'code' in res.data &&
+    'data' in res.data
+  ) {
+    return res.data.data
+  }
+
+  // 兜底：直接返回
+  return res
+}
+
 const getList = async () => {
   listRes.loading = true
-  const res = await list(listQuery).catch(() => false)
-  listRes.loading = false
-  if (res && res.data) {
-    listRes.list = res.data.list || []
-    listRes.total = res.data.total || 0
+  try {
+    const res = await list({ ...listQuery })
+    const payload = unwrapResponseData(res)
+    if (!payload) {
+      listRes.list = []
+      listRes.total = 0
+      return
+    }
+
+    // 兼容误打到用户端套餐接口（data 为数组）
+    if (Array.isArray(payload)) {
+      listRes.list = payload
+      listRes.total = payload.length
+      return
+    }
+
+    const listData = payload.list ?? payload.plans ?? []
+    listRes.list = Array.isArray(listData) ? listData : []
+    const total = Number(payload.total)
+    listRes.total = Number.isFinite(total) ? total : listRes.list.length
+  } catch (e) {
+    // 错误已由 request 拦截器处理
+    listRes.list = []
+    listRes.total = 0
+  } finally {
+    listRes.loading = false
   }
 }
 
@@ -192,11 +238,15 @@ const submit = async () => {
   }
 
   const api = formData.id ? update : create
-  const res = await api(submitData).catch(() => false)
-  if (res) {
-    ElMessage.success(T('OperationSuccess'))
-    formVisible.value = false
-    getList()
+  try {
+    const res = await api(submitData)
+    if (res) {
+      ElMessage.success(T('OperationSuccess'))
+      formVisible.value = false
+      getList()
+    }
+  } catch (e) {
+    // 错误已由 request 拦截器处理
   }
 }
 
@@ -207,10 +257,14 @@ const del = async (row) => {
     type: 'warning',
   }).catch(() => false)
   if (!cf) return
-  const res = await remove({ id: row.id }).catch(() => false)
-  if (res) {
-    ElMessage.success(T('OperationSuccess'))
-    getList()
+  try {
+    const res = await remove({ id: row.id })
+    if (res) {
+      ElMessage.success(T('OperationSuccess'))
+      getList()
+    }
+  } catch (e) {
+    // 错误已由 request 拦截器处理
   }
 }
 

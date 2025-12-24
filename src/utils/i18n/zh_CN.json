@@ -754,5 +754,11 @@
   },
   "ShowFullConfig": {
     "One": "显示完整配置"
+  },
+  "PaymentDisabled": {
+    "One": "支付功能未启用"
+  },
+  "NoData": {
+    "One": "暂无数据"
   }
 }
