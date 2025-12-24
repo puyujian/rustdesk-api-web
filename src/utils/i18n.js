@@ -8,26 +8,31 @@ import zhTW from '@/utils/i18n/zh_TW.json'
 import { useAppStore } from '@/store/app'
 
 const trans = {
-  'en': en,
-  'fr': fr,
+  en,
+  fr,
   'zh-CN': zhCN,
-  'ko': ko,
-  'ru': ru,
-  'es': es,
+  ko,
+  ru,
+  es,
   'zh-TW': zhTW,
 }
-export function T (key, params, num = 0) {
+
+export function T (key, params = {}, num = 0) {
   const appStore = useAppStore()
   const lang = appStore.setting.lang
   const tran = trans[lang]?.[key]
   if (!tran) {
     return key
   }
+
   const msg = num > 1 ? (tran.Other ? tran.Other : tran.One) : tran.One
-  //msg 是这样 {name} is name
-  //params 是这样 {name: 'zhangsan'}
-  //替换
-  return msg.replace(/{(\w+)}/g, function (match, key) {
-    return params[key] || match
+  const safeParams = (params && typeof params === 'object') ? params : {}
+
+  // msg 形如："{name} is name"，params 形如：{ name: "zhangsan" }
+  return msg.replace(/{(\w+)}/g, (match, placeholderKey) => {
+    if (Object.prototype.hasOwnProperty.call(safeParams, placeholderKey)) {
+      return String(safeParams[placeholderKey])
+    }
+    return match
   })
 }

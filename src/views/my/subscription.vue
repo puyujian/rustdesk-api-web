@@ -110,11 +110,11 @@ const formatDuration = (plan) => {
   const count = plan.period_count || 1
   const unit = plan.period_unit || 'month'
   const unitMap = {
-    day: T('Days'),
-    month: T('Months'),
-    year: T('Years'),
+    day: T('Days', { param: '' }, count),
+    month: T('Months', { param: '' }, count),
+    year: T('Years', { param: '' }, count),
   }
-  return `${count} ${unitMap[unit] || unit}`
+  return `${count} ${String(unitMap[unit] || unit || '').trim()}`
 }
 
 const formatTimestamp = (ts) => {

@@ -20,7 +20,7 @@
         </el-table-column>
         <el-table-column :label="T('Duration')" align="center">
           <template #default="{ row }">
-            {{ row.period_count }} {{ periodUnitText(row.period_unit) }}
+            {{ row.period_count }} {{ periodUnitText(row.period_unit, row.period_count) }}
           </template>
         </el-table-column>
         <el-table-column prop="description" :label="T('Description')" align="center" show-overflow-tooltip />
@@ -67,9 +67,9 @@
         <el-form-item :label="T('Duration')" prop="period_count">
           <el-input-number v-model="formData.period_count" :min="1" style="width: 120px;" />
           <el-select v-model="formData.period_unit" style="width: 100px; margin-left: 8px;">
-            <el-option :label="T('Days')" value="day" />
-            <el-option :label="T('Months')" value="month" />
-            <el-option :label="T('Years')" value="year" />
+            <el-option :label="periodUnitText('day', 1)" value="day" />
+            <el-option :label="periodUnitText('month', 1)" value="month" />
+            <el-option :label="periodUnitText('year', 1)" value="year" />
           </el-select>
         </el-form-item>
         <el-form-item :label="T('Description')" prop="description">
@@ -112,13 +112,13 @@ const formatPrice = (priceFen) => {
   return (priceFen / 100).toFixed(2)
 }
 
-const periodUnitText = (unit) => {
+const periodUnitText = (unit, count = 1) => {
   const map = {
-    day: T('Days'),
-    month: T('Months'),
-    year: T('Years'),
+    day: T('Days', { param: '' }, count),
+    month: T('Months', { param: '' }, count),
+    year: T('Years', { param: '' }, count),
   }
-  return map[unit] || unit
+  return String(map[unit] || unit || '').trim()
 }
 
 const unwrapResponseData = (res) => {
