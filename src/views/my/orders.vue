@@ -73,6 +73,7 @@
 <script setup>
 import { reactive, onMounted, onActivated, watch } from 'vue'
 import { getOrders, createOrder } from '@/api/subscription'
+import { redirectToPay } from '@/utils/payment'
 import { T } from '@/utils/i18n'
 import { ElMessage } from 'element-plus'
 
@@ -140,12 +141,12 @@ const statusText = (status) => {
 
 const toPay = async (row) => {
   if (row.pay_url) {
-    window.location.href = row.pay_url
+    redirectToPay(row.pay_url)
     return
   }
   const res = await createOrder({ plan_id: row.plan_id }).catch(() => false)
   if (res && res.data && res.data.pay_url) {
-    window.location.href = res.data.pay_url
+    redirectToPay(res.data.pay_url)
   } else {
     ElMessage.error(T('OperationFailed'))
   }

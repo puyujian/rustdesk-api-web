@@ -86,6 +86,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getPlans, getStatus, createOrder } from '@/api/subscription'
+import { redirectToPay } from '@/utils/payment'
 import { T } from '@/utils/i18n'
 import { ElMessage } from 'element-plus'
 
@@ -203,7 +204,7 @@ const handleSubscribe = async (plan) => {
     const outTradeNo = payload.out_trade_no || payload.outTradeNo || ''
 
     if (payURL) {
-      window.location.href = payURL
+      redirectToPay(payURL)
       return
     }
 
