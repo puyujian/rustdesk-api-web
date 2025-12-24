@@ -28,6 +28,10 @@ const conf = {
         // rewrite: path => path.replace(/^\/api/, '/api'), //为了模拟
         changeOrigin: true,
       },
+      '/api': {
+        target: process.env.VITE_SERVER_PATH,
+        changeOrigin: true,
+      },
     },
   },
   build: {

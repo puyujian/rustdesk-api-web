@@ -52,7 +52,7 @@
       />
     </el-card>
 
-    <el-dialog v-model="formVisible" width="600" :title="!formData.id ? T('Create') : T('Update')">
+    <el-dialog v-model="formVisible" width="600px" :title="!formData.id ? T('Create') : T('Update')">
       <el-form ref="form" :model="formData" label-width="120px" :rules="rules">
         <el-form-item :label="T('PlanCode')" prop="code">
           <el-input v-model="formData.code" placeholder="e.g. monthly, yearly" />

@@ -238,6 +238,12 @@ export const asyncRoutes = [
         meta: { title: 'SubscriptionManage', icon: 'Ticket' /*keepAlive: true*/ },
         component: () => import('@/views/admin/subscription.vue'),
       },
+      {
+        path: '/paymentConfig',
+        name: 'PaymentConfig',
+        meta: { title: 'PaymentConfig', icon: 'CreditCard' /*keepAlive: true*/ },
+        component: () => import('@/views/admin/payment_config.vue'),
+      },
     ],
   },
 ]

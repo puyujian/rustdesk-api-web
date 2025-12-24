@@ -709,5 +709,50 @@
   },
   "OperationFailed": {
     "One": "操作失败"
+  },
+  "PaymentConfig": {
+    "One": "支付配置"
+  },
+  "EnablePayment": {
+    "One": "启用支付"
+  },
+  "BaseURL": {
+    "One": "支付网关地址"
+  },
+  "MerchantID": {
+    "One": "商户ID"
+  },
+  "MerchantIDPlaceholder": {
+    "One": "请输入商户ID (pid)"
+  },
+  "MerchantKey": {
+    "One": "商户密钥"
+  },
+  "MerchantKeyPlaceholder": {
+    "One": "请输入商户密钥 (key)"
+  },
+  "NotifyURL": {
+    "One": "异步回调地址"
+  },
+  "NotifyURLPlaceholder": {
+    "One": "https://your-domain.com/api/payment/notify"
+  },
+  "NotifyURLTip": {
+    "One": "支付成功后支付网关会向此地址发送通知，必须是公网可访问的地址"
+  },
+  "ReturnURL": {
+    "One": "支付成功跳转"
+  },
+  "ReturnURLPlaceholder": {
+    "One": "https://your-domain.com/payment/result"
+  },
+  "ReturnURLTip": {
+    "One": "用户支付成功后跳转回的页面地址"
+  },
+  "Seconds": {
+    "One": "秒"
+  },
+  "ShowFullConfig": {
+    "One": "显示完整配置"
   }
 }

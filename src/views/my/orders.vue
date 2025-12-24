@@ -139,6 +139,10 @@ const statusText = (status) => {
 }
 
 const toPay = async (row) => {
+  if (row.pay_url) {
+    window.location.href = row.pay_url
+    return
+  }
   const res = await createOrder({ plan_id: row.plan_id }).catch(() => false)
   if (res && res.data && res.data.pay_url) {
     window.location.href = res.data.pay_url

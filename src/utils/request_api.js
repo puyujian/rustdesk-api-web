@@ -19,7 +19,7 @@ service.interceptors.request.use(
     const userStore = useUserStore(pinia)
     const token = userStore.token || getToken()
     if (token) {
-      config.headers['api-token'] = token
+      config.headers['Authorization'] = `Bearer ${token}`
     }
     const app = useAppStore()
     const lang = app.setting.lang
