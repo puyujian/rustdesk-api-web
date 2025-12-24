@@ -101,6 +101,31 @@ const status = reactive({
   expire_at: '',
 })
 
+const unwrapResponseData = (res) => {
+  if (!res) return null
+
+  // request 拦截器默认返回后端统一结构：{ code, message, data }
+  if (typeof res === 'object' && !Array.isArray(res) && 'code' in res && 'data' in res) {
+    return res.data
+  }
+
+  // 兼容未开启拦截器时的 axios 原始 response：{ data: { code, message, data } }
+  if (
+    typeof res === 'object' &&
+    !Array.isArray(res) &&
+    'data' in res &&
+    res.data &&
+    typeof res.data === 'object' &&
+    'code' in res.data &&
+    'data' in res.data
+  ) {
+    return res.data.data
+  }
+
+  // 兜底：直接返回
+  return res
+}
+
 const formatPrice = (priceFen) => {
   if (!priceFen) return '0.00'
   return (priceFen / 100).toFixed(2)
@@ -127,8 +152,14 @@ const loadPlans = async () => {
   loading.value = true
   try {
     const res = await getPlans()
-    if (res && res.data) {
-      plans.value = res.data.list || res.data || []
+    const payload = unwrapResponseData(res)
+    if (!payload) {
+      plans.value = []
+    } else if (Array.isArray(payload)) {
+      plans.value = payload
+    } else {
+      const listData = payload.list ?? payload.plans ?? []
+      plans.value = Array.isArray(listData) ? listData : []
     }
   } catch (e) {
     // 支付功能未启用时不显示错误提示，只记录状态
@@ -143,15 +174,15 @@ const loadPlans = async () => {
 const loadStatus = async () => {
   try {
     const res = await getStatus()
-    if (res && res.data) {
-      const data = res.data
-      paymentEnabled.value = data.payment_enabled !== false
-      const sub = data.subscription || {}
-      status.plan_id = sub.plan_id || null
-      status.plan_name = sub.plan?.name || ''
-      status.is_active = data.active || false
-      status.expire_at = sub.expire_at ? formatTimestamp(sub.expire_at) : ''
-    }
+    const payload = unwrapResponseData(res)
+    if (!payload) return
+
+    paymentEnabled.value = payload.payment_enabled !== false
+    const sub = payload.subscription || {}
+    status.plan_id = sub.plan_id || null
+    status.plan_name = sub.plan?.name || ''
+    status.is_active = payload.active || false
+    status.expire_at = sub.expire_at ? formatTimestamp(sub.expire_at) : ''
   } catch (e) {
     // 忽略错误
   }
@@ -165,13 +196,20 @@ const handleSubscribe = async (plan) => {
   subscribing.value = plan.id
   try {
     const res = await createOrder({ plan_id: plan.id })
-    if (res && res.data) {
-      if (res.data.pay_url) {
-        window.location.href = res.data.pay_url
-      } else if (res.data.out_trade_no) {
-        ElMessage.success(T('OperationSuccess'))
-        loadStatus()
-      }
+    const payload = unwrapResponseData(res)
+    if (!payload) return
+
+    const payURL = payload.pay_url || payload.payURL || ''
+    const outTradeNo = payload.out_trade_no || payload.outTradeNo || ''
+
+    if (payURL) {
+      window.location.href = payURL
+      return
+    }
+
+    if (outTradeNo) {
+      ElMessage.success(T('OperationSuccess'))
+      loadStatus()
     }
   } catch (e) {
     // 错误已由 request 拦截器处理
