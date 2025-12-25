@@ -55,12 +55,25 @@
             {{ row.created_at }}
           </template>
         </el-table-column>
-        <el-table-column :label="T('Actions')" align="center" width="100">
+        <el-table-column :label="T('Actions')" align="center" width="180" fixed="right">
           <template #default="{ row }">
+            <el-button type="primary" size="small" link @click="handleDetail(row)">
+              {{ T('Detail') }}
+            </el-button>
+            <el-button
+              v-if="row.status === 0"
+              type="warning"
+              size="small"
+              link
+              @click="handleClose(row)"
+            >
+              {{ T('Close') }}
+            </el-button>
             <el-button
               v-if="row.status === 1"
               type="danger"
               size="small"
+              link
               @click="handleRefund(row)"
             >
               {{ T('Refund') }}
@@ -79,12 +92,33 @@
         :total="listRes.total"
       />
     </el-card>
+
+    <!-- 订单详情弹窗 -->
+    <el-dialog v-model="detailVisible" width="600" :title="T('OrderDetail')">
+      <el-descriptions :column="2" border v-if="detailData">
+        <el-descriptions-item label="ID">{{ detailData.id }}</el-descriptions-item>
+        <el-descriptions-item :label="T('OrderNo')">{{ detailData.out_trade_no }}</el-descriptions-item>
+        <el-descriptions-item :label="T('Username')">{{ detailData.user?.username || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="T('PlanName')">{{ detailData.plan?.name || detailData.subject || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="T('Amount')">¥{{ formatPrice(detailData.amount) }}</el-descriptions-item>
+        <el-descriptions-item :label="T('OrderStatus')">
+          <el-tag :type="statusType(detailData.status)">{{ statusText(detailData.status) }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item :label="T('TradeNo')">{{ detailData.trade_no || '-' }}</el-descriptions-item>
+        <el-descriptions-item :label="T('PaymentTime')">{{ formatTimestamp(detailData.paid_at) }}</el-descriptions-item>
+        <el-descriptions-item :label="T('RefundTime')">{{ formatTimestamp(detailData.refunded_at) }}</el-descriptions-item>
+        <el-descriptions-item :label="T('CreatedAt')">{{ detailData.created_at }}</el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="detailVisible = false">{{ T('Close') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { reactive, onMounted, onActivated, watch } from 'vue'
-import { list, refund } from '@/api/admin/order'
+import { reactive, ref, onMounted, onActivated, watch } from 'vue'
+import { list, detail, refund, close } from '@/api/admin/order'
 import { T } from '@/utils/i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -101,6 +135,9 @@ const listQuery = reactive({
   user_id: '',
   status: null,
 })
+
+const detailVisible = ref(false)
+const detailData = ref(null)
 
 const formatPrice = (priceFen) => {
   if (!priceFen && priceFen !== 0) return '0.00'
@@ -152,6 +189,28 @@ const statusText = (status) => {
     3: T('Closed'),
   }
   return map[status] ?? String(status)
+}
+
+const handleDetail = async (row) => {
+  const res = await detail(row.id).catch(() => false)
+  if (res && res.data) {
+    detailData.value = res.data
+    detailVisible.value = true
+  }
+}
+
+const handleClose = async (row) => {
+  const cf = await ElMessageBox.confirm(T('Confirm?', { param: T('CloseOrder') }), {
+    confirmButtonText: T('Confirm'),
+    cancelButtonText: T('Cancel'),
+    type: 'warning',
+  }).catch(() => false)
+  if (!cf) return
+  const res = await close({ id: row.id }).catch(() => false)
+  if (res) {
+    ElMessage.success(T('OperationSuccess'))
+    getList()
+  }
 }
 
 const handleRefund = async (row) => {

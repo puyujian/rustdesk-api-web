@@ -22,3 +22,11 @@ export function refund (data) {
     data,
   })
 }
+
+export function close (data) {
+  return request({
+    url: '/order/close',
+    method: 'post',
+    data,
+  })
+}

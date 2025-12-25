@@ -703,5 +703,20 @@
   },
   "NoData": {
     "One": "No data"
+  },
+  "OrderDetail": {
+    "One": "Order Detail"
+  },
+  "CloseOrder": {
+    "One": "Close Order"
+  },
+  "TradeNo": {
+    "One": "Trade No"
+  },
+  "RefundTime": {
+    "One": "Refund Time"
+  },
+  "Detail": {
+    "One": "Detail"
   }
 }

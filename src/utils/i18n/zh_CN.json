@@ -763,5 +763,20 @@
   },
   "NoData": {
     "One": "暂无数据"
+  },
+  "OrderDetail": {
+    "One": "订单详情"
+  },
+  "CloseOrder": {
+    "One": "关闭订单"
+  },
+  "TradeNo": {
+    "One": "交易号"
+  },
+  "RefundTime": {
+    "One": "退款时间"
+  },
+  "Detail": {
+    "One": "详情"
   }
 }
