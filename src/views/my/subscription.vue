@@ -63,9 +63,10 @@
             <el-button
               v-if="status.plan_id === plan.id"
               type="success"
-              disabled
+              @click="handleSubscribe(plan)"
+              :loading="subscribing === plan.id"
             >
-              {{ T('CurrentPlan') }}
+              {{ T('RenewNow') }}
             </el-button>
             <el-button
               v-else
@@ -73,7 +74,7 @@
               @click="handleSubscribe(plan)"
               :loading="subscribing === plan.id"
             >
-              {{ status.plan_name ? T('RenewNow') : T('Subscribe') }}
+              {{ status.plan_name ? T('ChangePlan') : T('Subscribe') }}
             </el-button>
           </div>
         </el-card>

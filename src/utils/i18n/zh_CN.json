@@ -665,6 +665,9 @@
   "RenewNow": {
     "One": "立即续费"
   },
+  "ChangePlan": {
+    "One": "切换套餐"
+  },
   "PaymentSuccess": {
     "One": "支付成功"
   },

@@ -649,6 +649,9 @@
   "RenewNow": {
     "One": "Renew Now"
   },
+  "ChangePlan": {
+    "One": "Change Plan"
+  },
   "PaymentSuccess": {
     "One": "Payment Success"
   },
